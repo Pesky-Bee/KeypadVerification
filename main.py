@@ -1,8 +1,10 @@
 
-from time import sleep
+import time
 import RPi.GPIO as GPIO
 import threading
-from queue import Queue
+
+FWD = GPIO.HIGH
+REV = GPIO.LOW
 
 ###########################################
 # Setup
@@ -59,42 +61,26 @@ class MotorMovement(threading.Thread):
     def __init__(self):
         super(MotorMovement, self).__init__()
 
-    def Motor_X_Move_FWD(self, Distance_mm):
+    def Motor_X_Move(self, Distance_mm, Direction):
+        GPIO.output(DIR_X, Direction)
         for x in range(Distance_mm):
             if GPIO.input(STOP_X) != GPIO.LOW:
-                GPIO.output(DIR_X, GPIO.HIGH)
                 GPIO.output(STEP_X, GPIO.HIGH)
-                sleep(delay)
+                time.sleep(delay)
                 GPIO.output(STEP_X, GPIO.LOW)
-                sleep(delay)
+                time.sleep(delay)
 
-    def Motor_X_Move_REV(self, Distance_mm):
-        for x in range(Distance_mm):
-            GPIO.output(DIR_X, GPIO.LOW)
-            GPIO.output(STEP_X, GPIO.HIGH)
-            sleep(delay)
-            GPIO.output(STEP_X, GPIO.LOW)
-            sleep(delay)
-
-    def Motor_Y_Move_FWD(self, Distance_mm):
+    def Motor_Y_Move(self, Distance_mm, Direction):
+        GPIO.output(DIR_Y, Direction)
         for x in range(Distance_mm):
             if GPIO.input(STOPtop_Y) != GPIO.LOW:
-                GPIO.output(DIR_Y, GPIO.HIGH)
                 GPIO.output(STEP_Y, GPIO.HIGH)
-                sleep(delay)
+                time.sleep(delay)
                 GPIO.output(STEP_Y, GPIO.LOW)
-                sleep(delay)
-
-    def Motor_Y_Move_REV(self, Distance_mm):
-        for x in range(Distance_mm):
-            if GPIO.input(STOPbottom_Y) != GPIO.LOW:
-                GPIO.output(DIR_Y, GPIO.LOW)
-                GPIO.output(STEP_Y, GPIO.HIGH)
-                sleep(delay)
-                GPIO.output(STEP_Y, GPIO.LOW)
-                sleep(delay)
+                time.sleep(delay)
 
 
+MotorControl = MotorMovement()
 #######################################
 # Functions
 
@@ -102,22 +88,22 @@ class MotorMovement(threading.Thread):
 # Calibration
 # Initial
 # How many steps needed to move 1mm
-start = time.time
-MotorMovement.Motor_X_Move_FWD(self, SPR)
-finish = time.time
+start = time.time()
+MotorControl.Motor_X_Move(SPR, FWD)
+finish = time.time()
 print("Time taken:", (finish - start))
 
-start = time.time
-MotorMovement.Motor_Y_Move_FWD(self, SPR)
-finish = time.time
-print("Time taken:", (finish - start))
+start = time.time()
+MotorControl.Motor_Y_Move(SPR, FWD)
+finish = time.time()
+print("Time taken:", (finish-start))
 
 # Motor
 #   motor on while sensor not active, continue
 #   stop motor for that sensor
 #   other motor on until other sensor activates
-MotorThreadX = threading.Thread(target=Motor_X_FWD, args=(self, 200))
-MotorThreadY = threading.Thread(target=Motor_Y_FWD, args=(self, 200))
+MotorThreadX = threading.Thread(target=MotorControl.Motor_X_Move(2000, FWD))
+MotorThreadY = threading.Thread(target=MotorControl.Motor_Y_Move(2000, FWD))
 MotorThreadX.start()
 MotorThreadY.start()
 MotorThreadX.join()
