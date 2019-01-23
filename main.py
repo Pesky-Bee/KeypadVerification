@@ -4,6 +4,9 @@ import RPi.GPIO as GPIO
 import numpy as np
 import cv2
 import math
+from imutils.object_detection import non_max_suppression
+import pytesseract
+import argparse
 
 GPIO.setwarnings(False)
 
@@ -134,7 +137,7 @@ MotorControl.Motor_Y_Move_FWD(2000)
 # Both motors now at max positive positions and out of the way of camera
 
 # Camera
-# Camera take picture of keypad to know where numbers located and the pattern for distance, segment them?
+# Camera take picture of keypad to know where numbers located + recognition? and the pattern for distance, segment them?
 ret, frame = cap.read()  # read frame
 frame75 = scale(frame, percent=75)
 framegray = cv2.cvtColor(frame75, cv2.COLOR_BGR2GRAY)
@@ -207,3 +210,7 @@ ScreenRegion = cv2.selectROI("Region", framegray, False, False)
 GPIO.cleanup()
 cap.release()
 cv2.destroyAllWindows()
+
+# https://www.pyimagesearch.com/2018/09/17/opencv-ocr-and-text-recognition-with-tesseract/
+# pip install pytesseract
+# pip install imutils
