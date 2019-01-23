@@ -139,7 +139,7 @@ ret, frame = cap.read()  # read frame
 frame75 = scale(frame, percent=75)
 framegray = cv2.cvtColor(frame75, cv2.COLOR_BGR2GRAY)
 edges = cv2.Canny(framegray, 30, 200)
-ret, thresh = cv2.threshold(framegray, 127, 255, 0)
+ret, thresh = cv2.threshold(framegray, 127, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
 
 # noise removal
 kernel = np.ones((3, 3), np.uint8)
