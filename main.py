@@ -140,7 +140,7 @@ frame75 = scale(frame, percent=75)
 framegray = cv2.cvtColor(frame75, cv2.COLOR_BGR2GRAY)
 edges = cv2.Canny(framegray, 30, 200)
 ret, thresh = cv2.threshold(framegray, 127, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-
+# #####
 # noise removal
 kernel = np.ones((3, 3), np.uint8)
 opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
@@ -160,10 +160,27 @@ markers = markers+1
 markers[unknown == 255] = 0
 markers = cv2.watershed(frame75, markers)
 frame75[markers == -1] = [255, 0, 0]
+# #####
+# OR
+# find contours in the binary image
+im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+for c in contours:
+    # calculate moments for each contour
+    M = cv2.moments(c)
+
+    # calculate x,y coordinate of center
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
+    cv2.circle(frame75, (cX, cY), 5, (255, 255, 255), -1)
+    cv2.putText(frame75, "centroid", (cX - 25, cY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+    # display the image
+    cv2.imshow("Image", frame75)
+    cv2.waitKey(0)
 
 # cv2.imshow('frame',framegray)
 # cv2.imshow('frame', edges)
-# cv2.imshow('frame',frame) #show frame
+# cv2.imshow('frame',frame) #show initial frame
 
 # Use image to Calibrate from known length between pattern
 #   calculate distance of projected pattern line length, and scale from actual
@@ -176,7 +193,8 @@ calculateDistance(x1, y1, x2, y2)
 ######################################
 
 # Read first prompt
-
+#   Region of interest?
+ScreenRegion = cv2.selectROI("Region", framegray, False, False)
 # Interpret what needs to be pressed
 
 # Go through sequence of required presses
