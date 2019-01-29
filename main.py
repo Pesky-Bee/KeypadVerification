@@ -197,7 +197,7 @@ MotorControl.Motor_Y_Move_FWD(2000)
 # Camera take picture of keypad to know where numbers located + recognition? and the pattern for distance, segment them?
 ret, frame = cap.read()  # read frame
 frame75 = scale(frame, percent=75)
-framegray = cv2.cvtColor(frame75, cv2.COLOR_BGR2GRAY)
+framegray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 edges = cv2.Canny(framegray, 30, 200)
 ret, thresh = cv2.threshold(framegray, 127, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
 # #####
@@ -229,19 +229,22 @@ opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=3)
 cv2.imshow("image", opening)
 
 contours, hierarchy = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
 for c in contours[1:]:
     # calculate moments for each contour
     M = cv2.moments(c)
-
     # calculate x,y coordinate of center
-    cX = int(M["m10"] / M["m00"])
-    cY = int(M["m01"] / M["m00"])
-    cv2.circle(frame75, (cX, cY), 5, (255, 255, 255), -1)
-    cv2.putText(frame75, "c", (cX - 25, cY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+    # ensure no division by 0
+    if M["m00"] != 0:
+        cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
+    else:
+        cX, cY = 0, 0
+    # visulise and place center
+    cv2.circle(frame, (cX, cY), 5, (255, 255, 255), -1)
+    cv2.putText(frame, "c", (cX - 25, cY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
     # display the image
-    cv2.imshow("Image", frame75)
+    cv2.imshow("Image", frame)
 cv2.waitKey(0)
 #cv2.imwrite("thresh.jpg", thresh)
 #cv2.imwrite("frame.jpg", frame75)
