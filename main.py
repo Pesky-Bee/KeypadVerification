@@ -246,8 +246,8 @@ for c in contours[1:]:
     # display the image
     cv2.imshow("Image", frame)
 cv2.waitKey(0)
-#cv2.imwrite("thresh.jpg", thresh)
-#cv2.imwrite("frame.jpg", frame75)
+# cv2.imwrite("thresh.jpg", thresh)
+# cv2.imwrite("frame.jpg", frame75)
 
 # cv2.imshow('frame', edges)
 # cv2.imshow('frame',frame) #show initial frame
